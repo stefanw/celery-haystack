@@ -1,6 +1,8 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.core.management import call_command
 from django.db.models.loading import get_model
+from django.utils import translation
+from django.conf import settings as django_settings
 
 from .conf import settings
 
@@ -104,6 +106,7 @@ class CeleryHaystackSignalHandler(Task):
         Trigger the actual index handler depending on the
         given action ('update' or 'delete').
         """
+        translation.activate(django_settings.LANGUAGE_CODE)
         logger = self.get_logger(**kwargs)
 
         # First get the object path and pk (e.g. ('notes.note', 23))
@@ -165,6 +168,7 @@ class CeleryHaystackUpdateIndex(Task):
     command from Celery.
     """
     def run(self, apps=None, **kwargs):
+        translation.activate(django_settings.LANGUAGE_CODE)
         logger = self.get_logger(**kwargs)
         defaults = {
             'batchsize': settings.CELERY_HAYSTACK_COMMAND_BATCH_SIZE,
