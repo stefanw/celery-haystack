@@ -28,4 +28,5 @@ def enqueue_task(action, instance):
     model instance.
     """
     identifier = get_identifier(instance)
-    get_update_task().delay(action, identifier)
+    get_update_task().apply_async((action, identifier),
+                                  countdown=settings.CELERY_HAYSTACK_COUNTDOWN)
